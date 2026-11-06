@@ -1,5 +1,5 @@
 #!/bin/sh
-# Consistent snapshot of the world and config.
+# Consistent backup of the world and config.
 #
 # Minecraft keeps writing region files while it runs, so a live tar can capture
 # a torn world. This stops the service (which saves and exits), archives, then
@@ -15,12 +15,10 @@ fi
 
 DEST=${NP_BACKUP_DIR:-"$ROOT/backups"}
 KEEP=${NP_BACKUP_KEEP:-14}
-SNAPSHOTS=${NP_SNAPSHOT_DIR:-"$ROOT/snapshots"}
-SNAPSHOT_KEEP=${NP_SNAPSHOT_KEEP:-5}
 STAMP=$(date +%Y%m%d-%H%M%S)
 
 umask 077
-mkdir -p "$DEST" "$SNAPSHOTS"
+mkdir -p "$DEST"
 chmod 700 "$DEST"
 
 exec 9>"$DEST/.lock"
@@ -54,19 +52,7 @@ tar -C "$ROOT" -czf "$DEST/np-$STAMP.tar.gz" \
     --exclude='./world/session.lock' \
     .
 
-tar -C "$ROOT" -czf "$SNAPSHOTS/world-$STAMP.tar.gz" \
-    --exclude='./world/session.lock' \
-    --exclude='./world/players' \
-    --exclude='./world/playerdata' \
-    --exclude='./world/stats' \
-    --exclude='./world/advancements' \
-    ./world
-
 ls -1t "$DEST"/np-*.tar.gz 2>/dev/null | tail -n +$((KEEP + 1)) | while read -r f; do
-    rm -f "$f"
-done
-
-ls -1t "$SNAPSHOTS"/world-*.tar.gz 2>/dev/null | tail -n +$((SNAPSHOT_KEEP + 1)) | while read -r f; do
     rm -f "$f"
 done
 
@@ -79,4 +65,3 @@ if [ -n "${NP_BACKUP_REMOTE:-}" ]; then
 fi
 
 echo "backup written: $DEST/np-$STAMP.tar.gz"
-echo "snapshot written: $SNAPSHOTS/world-$STAMP.tar.gz"

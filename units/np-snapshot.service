@@ -1,0 +1,8 @@
+[Unit]
+Description=Snapshot the vanilla Minecraft world for the public repo
+
+[Service]
+Type=oneshot
+ExecStart=/home/ajg/servers/npsmp/scripts/snapshot.sh
+Nice=10
+IOSchedulingClass=idle
