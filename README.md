@@ -89,22 +89,22 @@ server — use `systemctl --user stop np` for that.
 RCON listens on `127.0.0.1:25576` only and reads its password from
 `server.properties`. That file is tracked, so keep the repo private.
 
-## Whitelist and friends
+## Friends and access
 
-The server starts with `white-list=true` and `enforce-whitelist=true`.
-`Vivacane` is already whitelisted. Add a friend while the server is running:
+The server is currently open: `white-list=false`, `enforce-whitelist=false`,
+and `whitelist.json` is empty. Anyone with the playit address can join.
+
+To restrict it later, add names and turn the whitelist on:
 
 ```sh
 scripts/rcon.py whitelist add TheirMinecraftName
 scripts/rcon.py whitelist list
 ```
 
-Remove one with `whitelist remove TheirMinecraftName`. There are no ops: use
-RCON or the console for admin commands. If you edit `whitelist.json` by hand,
-run `scripts/rcon.py whitelist reload`.
-
-To open the server to anyone with the address, set `white-list=false` in
-`server.properties` and restart. Keeping the whitelist on is safer.
+Then set `white-list=true` and `enforce-whitelist=true` in
+`server.properties` and restart. Remove a name with
+`scripts/rcon.py whitelist remove TheirMinecraftName`. There are no ops: use
+RCON or the console for admin commands.
 
 ## Updating Minecraft
 
@@ -173,8 +173,8 @@ manage the tunnels, so keep it private.
 
 ## Security notes
 
-- **Whitelist is the real control.** Keep `white-list=true` and
-  `enforce-whitelist=true` unless you deliberately want an open server.
+- **This server is open.** `white-list=false`, so anyone with the playit
+  address can join. Turn the whitelist on if that changes.
 - `server.properties` contains an RCON password and a management-server secret.
   Treat the repo as private; don't push it to a public remote.
 - The container bounds a compromise to this directory. It does not make
