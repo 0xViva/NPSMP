@@ -73,11 +73,12 @@ If `systemctl --user status playit` is not active, start it there first.
 ```sh
 systemctl --user start|stop|restart np
 systemctl --user status np
-journalctl --user -u np -f            # server console/log
+journalctl --user -u np -f            # follow live logs
+journalctl --user -u np -n 500 --no-pager  # older history
 podman ps                              # container view
 podman exec -it np bash                # shell in the container
 
-./console                              # persistent console (tmux); detach Ctrl-b d
+./console                              # history + live console (tmux)
 scripts/rcon.py list
 scripts/rcon.py whitelist add SomeName
 scripts/rcon.py save-all
@@ -87,9 +88,21 @@ systemctl --user status playit
 journalctl --user -u playit -f
 ```
 
-`./console` keeps the container's stdin open inside a tmux session, so closing
-Ghostty or SSH only detaches. `--sig-proxy=false` means Ctrl-C cannot stop the
-server — use `systemctl --user stop np` for that.
+`./console` creates the tmux session if needed, prints the last 200 journal
+lines, then attaches to the live container console. `podman attach` only shows
+output from the moment it connects, so the preload is what gives the tmux pane
+history. Use `Ctrl-b [` to scroll, `q` to leave scroll mode, and `Ctrl-b d` to
+detach. Set `NP_CONSOLE_HISTORY=500 ./console` for more preloaded lines. If the
+session already exists, `./console` just attaches; use `journalctl` for
+arbitrary history or kill the session (`tmux kill-session -t np-console`) to
+reload it.
+
+The tmux session keeps the container's stdin open, so closing Ghostty or SSH
+only detaches. `--sig-proxy=false` means Ctrl-C cannot stop the server — use
+`systemctl --user stop np` for that.
+
+If typing stops reaching the server, the attach socket has died: run
+`systemctl --user restart np`, then `./console` again.
 
 RCON listens on `127.0.0.1:25576` only and reads its password from
 `server.properties`. That file is local-only and ignored by git.

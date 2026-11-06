@@ -3,11 +3,15 @@
 #
 #   ./console              attach (creates the session if needed)
 #   Ctrl-b d               detach; the console keeps running
+#   Ctrl-b [               scroll back; q exits scroll mode
 #
-# tmux owns the pty, so closing Ghostty or losing the SSH connection does NOT
-# close the container's stdin. `--sig-proxy=false` means Ctrl-C cannot stop the
-# server; use `systemctl --user stop np` for that.
+# The first attach prints the last NP_CONSOLE_HISTORY journal lines before
+# switching to the live console. `podman attach` itself only shows output from
+# the moment it attaches, so this is how you get history in the pane.
 set -eu
 
 SESSION=${NP_CONSOLE_SESSION:-np-console}
-exec tmux new-session -A -s "$SESSION" 'podman attach --sig-proxy=false np'
+HISTORY=${NP_CONSOLE_HISTORY:-200}
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+
+exec tmux new-session -A -s "$SESSION" "$ROOT/scripts/console-live.sh $HISTORY"
