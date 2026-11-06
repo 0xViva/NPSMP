@@ -14,7 +14,19 @@ WorkingDir=/data
 # Minecraft updates. JVM flags are in user_jvm_args.txt.
 Exec=@user_jvm_args.txt -jar server.jar nogui
 
-Volume=/home/ajg/servers/npsmp:/data
+# The repo is read-only to the server. Only the save, logs, crash reports,
+# and mutable config are writable, so a compromised JVM cannot rewrite the
+# scripts or git hooks the host runs.
+Volume=/home/ajg/servers/npsmp:/data:ro
+Volume=/home/ajg/servers/npsmp/world:/data/world:rw
+Volume=/home/ajg/servers/npsmp/logs:/data/logs:rw
+Volume=/home/ajg/servers/npsmp/crash-reports:/data/crash-reports:rw
+Volume=/home/ajg/servers/npsmp/server.properties:/data/server.properties:rw
+Volume=/home/ajg/servers/npsmp/whitelist.json:/data/whitelist.json:rw
+Volume=/home/ajg/servers/npsmp/ops.json:/data/ops.json:rw
+Volume=/home/ajg/servers/npsmp/banned-ips.json:/data/banned-ips.json:rw
+Volume=/home/ajg/servers/npsmp/banned-players.json:/data/banned-players.json:rw
+Volume=/home/ajg/servers/npsmp/usercache.json:/data/usercache.json:rw
 
 # Loopback only: the playit agent on the host is the only thing that may reach
 # the server. Nothing is published on the LAN or WAN.
@@ -28,10 +40,11 @@ Tmpfs=/tmp:rw,size=1g
 LogDriver=journald
 StopTimeout=120
 
-# /data is the only writable path; drop everything else.
+# Drop everything except the writable data mounts above, and cap CPU so a
+# malicious client cannot starve the host or the other server.
 # --interactive keeps the container's stdin open so `podman attach` can type
 # into the server console (./console).
-PodmanArgs=--interactive --memory=6g --pids-limit=2048 --cap-drop=all --security-opt=no-new-privileges
+PodmanArgs=--interactive --memory=6g --pids-limit=2048 --cpus=8 --cap-drop=all --security-opt=no-new-privileges
 
 [Service]
 Restart=on-failure

@@ -16,6 +16,7 @@
 NPSMP is a vanilla Minecraft server for the Norsk programmering community.
 It lives at `/home/ajg/servers/npsmp`, runs under systemd in a rootless Podman
 container, and reaches players through a playit.gg tunnel. Setup is in
-`scripts/`, `units/`, and `container/`.
+`scripts/`, `units/`, and `container/`. The world is tracked in `world/`. World
+seed is `6984882314756710026`.
 
 Unlicensed. Questions go to [GitHub Issues](https://github.com/0xViva/NPSMP/issues).

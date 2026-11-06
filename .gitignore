@@ -6,13 +6,13 @@
 # Local config with secrets; create it with scripts/init-config.sh
 /server.properties
 
-# Generated at runtime
-/world/
+# Runtime data. The world is tracked so a clone can restore the server.
 /logs/
 /crash-reports/
 /backups/
 /usercache.json
 /usernamecache.json
+/world/session.lock
 
 # Local-only scratch
 *.log

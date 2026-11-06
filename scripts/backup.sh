@@ -7,12 +7,19 @@
 set -eu
 
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+
+# Optional off-site copy. Configure NP_BACKUP_REMOTE in ~/.config/np/backup.env.
+if [ -f "$HOME/.config/np/backup.env" ]; then
+    . "$HOME/.config/np/backup.env"
+fi
+
 DEST=${NP_BACKUP_DIR:-"$ROOT/backups"}
 KEEP=${NP_BACKUP_KEEP:-14}
 STAMP=$(date +%Y%m%d-%H%M%S)
 
 umask 077
 mkdir -p "$DEST"
+chmod 700 "$DEST"
 
 exec 9>"$DEST/.lock"
 flock -n 9 || { echo "another backup is already running" >&2; exit 0; }
@@ -47,5 +54,13 @@ tar -C "$ROOT" -czf "$DEST/np-$STAMP.tar.gz" \
 ls -1t "$DEST"/np-*.tar.gz 2>/dev/null | tail -n +$((KEEP + 1)) | while read -r f; do
     rm -f "$f"
 done
+
+if [ -n "${NP_BACKUP_REMOTE:-}" ]; then
+    echo "syncing to $NP_BACKUP_REMOTE"
+    rsync -a --delete --exclude='.lock' --chmod=D700,F600 \
+        -e "ssh -o BatchMode=yes -o ConnectTimeout=15" \
+        --timeout=300 \
+        "$DEST/" "$NP_BACKUP_REMOTE"
+fi
 
 echo "backup written: $DEST/np-$STAMP.tar.gz"
