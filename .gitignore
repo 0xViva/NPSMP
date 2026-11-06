@@ -3,6 +3,9 @@
 /libraries/
 /versions/
 
+# Local config with secrets; create it with scripts/init-config.sh
+/server.properties
+
 # Generated at runtime
 /world/
 /logs/

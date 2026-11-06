@@ -21,9 +21,10 @@ publishes an SRV record; the explicit address is
   playit agent (the one installed for atm11); the `np-vanilla` tunnel is a
   second tunnel under that same agent. The agent's unit description still says
   "ATM11 server", but it serves both tunnels.
-- **This directory is the git repo.** `server.properties`, `whitelist.json`,
-  `ops.json`, `user_jvm_args.txt` and `VERSION` are tracked; `server.jar`,
-  `libraries/`, `versions/`, `world/` and `logs/` are ignored.
+- **This directory is the git repo.** `server.properties.example`,
+  `whitelist.json`, `ops.json`, `user_jvm_args.txt` and `VERSION` are tracked;
+  `server.properties` (the live secrets), `server.jar`, `libraries/`,
+  `versions/`, `world/` and `logs/` are ignored.
 
 ## Layout
 
@@ -32,8 +33,9 @@ publishes an SRV record; the explicit address is
 | `container/Containerfile` | yes | Java 25 runtime, pinned by digest |
 | `units/np.container` | yes | Quadlet unit (Podman → systemd) |
 | `units/np-backup.{service,timer}` | yes | nightly world+config archive |
-| `scripts/*.sh`, `scripts/*.py` | yes | install, download, backup, RCON, playit tunnel |
-| `server.properties` | yes | server config (contains RCON password) |
+| `scripts/*.sh`, `scripts/*.py` | yes | install, download, config, backup, RCON, playit tunnel |
+| `server.properties.example` | yes | template with placeholder secrets |
+| `server.properties` | no | live config; create with `scripts/init-config.sh` |
 | `whitelist.json`, `ops.json` | yes | player access |
 | `user_jvm_args.txt`, `VERSION` | yes | JVM flags and pinned MC version |
 | `server.jar`, `libraries/`, `versions/` | no | downloaded/extracted on first run |
@@ -43,20 +45,23 @@ publishes an SRV record; the explicit address is
 ## First-time setup
 
 ```sh
-# 1. Download the pinned Minecraft server jar (or the latest release)
+# 1. Create the local config with fresh secrets
+scripts/init-config.sh
+
+# 2. Download the pinned Minecraft server jar (or the latest release)
 scripts/download.sh
 
-# 2. Build the runtime image
+# 3. Build the runtime image
 podman build -t localhost/np-server:25 container
 
-# 3. Install the units (Quadlet reads ~/.config/containers/systemd)
+# 4. Install the units (Quadlet reads ~/.config/containers/systemd)
 scripts/install.sh
 
-# 4. Start and enable
+# 5. Start and enable
 systemctl --user start np          # Quadlet units are enabled by [Install]
 systemctl --user enable --now np-backup.timer
 
-# 5. Create the second playit tunnel (the agent is shared with atm11)
+# 6. Create the second playit tunnel (the agent is shared with atm11)
 scripts/playit-tunnel.py create
 ```
 
@@ -87,7 +92,7 @@ Ghostty or SSH only detaches. `--sig-proxy=false` means Ctrl-C cannot stop the
 server — use `systemctl --user stop np` for that.
 
 RCON listens on `127.0.0.1:25576` only and reads its password from
-`server.properties`. That file is tracked, so keep the repo private.
+`server.properties`. That file is local-only and ignored by git.
 
 ## Friends and access
 
@@ -175,8 +180,10 @@ manage the tunnels, so keep it private.
 
 - **This server is open.** `white-list=false`, so anyone with the playit
   address can join. Turn the whitelist on if that changes.
-- `server.properties` contains an RCON password and a management-server secret.
-  Treat the repo as private; don't push it to a public remote.
+- `server.properties` is local-only and ignored by git. It contains the RCON
+  password and management-server secret; `server.properties.example` has
+  placeholders. Never commit the real file. If it was ever committed, rotate
+  both secrets — deleting the file does not remove old commits.
 - The container bounds a compromise to this directory. It does not make
   Minecraft memory-safe: keep the server and Java updated, and don't install
   random plugins or datapacks.

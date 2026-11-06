@@ -1,5 +1,5 @@
 #Minecraft server properties
-#Fri Nov 06 14:48:45 CET 2026
+#Fri Nov 06 15:02:33 CET 2026
 accepts-transfers=false
 allow-flight=false
 broadcast-console-to-ops=true
@@ -33,7 +33,7 @@ management-server-allowed-origins=
 management-server-enabled=false
 management-server-host=localhost
 management-server-port=0
-management-server-secret=eaef8e60f03ae74e23aaab84825518c3
+management-server-secret=CHANGE_ME
 management-server-tls-enabled=true
 management-server-tls-keystore=
 management-server-tls-keystore-password=
@@ -50,7 +50,7 @@ player-idle-timeout=0
 prevent-proxy-connections=false
 query.port=25565
 rate-limit=0
-rcon.password=4b693ea394f28a9497dbc265244ca0dc
+rcon.password=CHANGE_ME
 rcon.port=25575
 region-file-compression=deflate
 require-resource-pack=false
