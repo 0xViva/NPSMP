@@ -1,6 +1,6 @@
 [Unit]
 Description=Vanilla Minecraft 26.3 (rootless podman)
-Documentation=file:///home/ajg/servers/np/README.md
+Documentation=file:///home/ajg/servers/npsmp/README.md
 After=network-online.target
 Wants=network-online.target
 
@@ -14,7 +14,7 @@ WorkingDir=/data
 # Minecraft updates. JVM flags are in user_jvm_args.txt.
 Exec=@user_jvm_args.txt -jar server.jar nogui
 
-Volume=/home/ajg/servers/np:/data
+Volume=/home/ajg/servers/npsmp:/data
 
 # Loopback only: the playit agent on the host is the only thing that may reach
 # the server. Nothing is published on the LAN or WAN.

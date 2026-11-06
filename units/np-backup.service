@@ -3,6 +3,6 @@ Description=Back up the vanilla Minecraft world and config
 
 [Service]
 Type=oneshot
-ExecStart=/home/ajg/servers/np/scripts/backup.sh
+ExecStart=/home/ajg/servers/npsmp/scripts/backup.sh
 Nice=10
 IOSchedulingClass=idle
