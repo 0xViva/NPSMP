@@ -1,0 +1,19 @@
+# Downloaded by scripts/download.sh, not tracked.
+/server.jar
+/libraries/
+/versions/
+
+# Generated at runtime
+/world/
+/logs/
+/crash-reports/
+/backups/
+/usercache.json
+/usernamecache.json
+
+# Local-only scratch
+*.log
+
+# Python bytecode
+__pycache__/
+*.pyc

@@ -1,0 +1,23 @@
+# JVM arguments for the vanilla server. `java @user_jvm_args.txt ...` reads this.
+# 4 GB is plenty for vanilla with ~20 players. Raise -Xmx if you add datapacks
+# or run a very large world; the container is limited to 6 GB.
+-Xms2G
+-Xmx4G
+-XX:+UseG1GC
+-XX:+ParallelRefProcEnabled
+-XX:MaxGCPauseMillis=200
+-XX:+UnlockExperimentalVMOptions
+-XX:+DisableExplicitGC
+-XX:+AlwaysPreTouch
+-XX:G1NewSizePercent=30
+-XX:G1MaxNewSizePercent=40
+-XX:G1HeapRegionSize=8M
+-XX:G1ReservePercent=20
+-XX:G1HeapWastePercent=5
+-XX:G1MixedGCCountTarget=4
+-XX:InitiatingHeapOccupancyPercent=15
+-XX:G1MixedGCLiveThresholdPercent=90
+-XX:G1RSetUpdatingPauseTimePercent=5
+-XX:SurvivorRatio=32
+-XX:+PerfDisableSharedMem
+-XX:MaxTenuringThreshold=1

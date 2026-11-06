@@ -1,0 +1,44 @@
+[Unit]
+Description=Vanilla Minecraft 26.3 (rootless podman)
+Documentation=file:///home/ajg/servers/np/README.md
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+ContainerName=np
+Image=localhost/np-server:25
+Pull=never
+WorkingDir=/data
+
+# The version lives in VERSION / server.jar; this line stays stable across
+# Minecraft updates. JVM flags are in user_jvm_args.txt.
+Exec=@user_jvm_args.txt -jar server.jar nogui
+
+Volume=/home/ajg/servers/np:/data
+
+# Loopback only: the playit agent on the host is the only thing that may reach
+# the server. Nothing is published on the LAN or WAN.
+PublishPort=127.0.0.1:25566:25565
+# RCON, loopback only: reachable with scripts/rcon.py, not from the LAN.
+PublishPort=127.0.0.1:25576:25575
+
+Environment=TZ=Europe/Oslo
+ReadOnly=true
+Tmpfs=/tmp:rw,size=1g
+LogDriver=journald
+StopTimeout=120
+
+# /data is the only writable path; drop everything else.
+# --interactive keeps the container's stdin open so `podman attach` can type
+# into the server console (./console).
+PodmanArgs=--interactive --memory=6g --pids-limit=2048 --cap-drop=all --security-opt=no-new-privileges
+
+[Service]
+Restart=on-failure
+RestartSec=15
+TimeoutStopSec=140
+# Java exits 143 (128+SIGTERM) after a clean shutdown-hook save.
+SuccessExitStatus=143
+
+[Install]
+WantedBy=default.target

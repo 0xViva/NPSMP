@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily vanilla Minecraft backup
+
+[Timer]
+OnCalendar=*-*-* 04:45:00
+Persistent=true
+RandomizedDelaySec=5m
+
+[Install]
+WantedBy=timers.target

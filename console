@@ -1,0 +1,13 @@
+#!/bin/sh
+# Persistent server console for the np container.
+#
+#   ./console              attach (creates the session if needed)
+#   Ctrl-b d               detach; the console keeps running
+#
+# tmux owns the pty, so closing Ghostty or losing the SSH connection does NOT
+# close the container's stdin. `--sig-proxy=false` means Ctrl-C cannot stop the
+# server; use `systemctl --user stop np` for that.
+set -eu
+
+SESSION=${NP_CONSOLE_SESSION:-np-console}
+exec tmux new-session -A -s "$SESSION" 'podman attach --sig-proxy=false np'

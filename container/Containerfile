@@ -1,0 +1,17 @@
+# Runtime image for vanilla Minecraft 26.3 (Java 25).
+# Only the JVM is in the image; server.jar, worlds and config are bind-mounted.
+#
+# Pinned by digest so a rebuild can't silently change the runtime.
+# To bump Java: `podman pull eclipse-temurin:25-jre` and update the digest.
+FROM docker.io/library/eclipse-temurin@sha256:5bc8e1bda53531e3ccf4c0d930e39095b68baeabbc81864fffa68291e14a607e
+
+ENV LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
+    TZ=Europe/Oslo
+
+# The container runs as root *inside* a rootless user namespace. That root maps
+# to the invoking host user, so /data files stay owned by you and the process
+# cannot reach anything outside the mounted data directory.
+WORKDIR /data
+
+ENTRYPOINT ["java"]
